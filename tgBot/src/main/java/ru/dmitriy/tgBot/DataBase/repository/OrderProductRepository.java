@@ -5,7 +5,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import ru.dmitriy.tgBot.DataBase.entity.OrderProduct;
 
-@RepositoryRestResource(collectionResourceRel = "order_products", path = "order_products")
+@RepositoryRestResource(collectionResourceRel = "orderProducts", path = "orderProducts")
 
 public interface OrderProductRepository extends JpaRepository<OrderProduct, Long>
 {
