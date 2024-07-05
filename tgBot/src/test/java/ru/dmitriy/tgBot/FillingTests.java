@@ -12,23 +12,25 @@ import ru.dmitriy.tgBot.DataBase.entity.Client;
 import ru.dmitriy.tgBot.DataBase.entity.Product;
 
 @SpringBootTest
-public class FillingTests {
+class FillingTests {
     
     @Autowired
     private ClientRepository clientRepository;
 
     @Test
-    public void createTwoClients() {
+    void createTwoClients() {
         Client client1 = new Client();
         client1.setAddress("address1");
         client1.setExternalId(1L);
         client1.setFullName("fullName1");
+        client1.setPhoneNumber("1111111");
         clientRepository.save(client1);
 
         Client client2 = new Client();
         client2.setAddress("address2");
         client2.setExternalId(2L);
         client2.setFullName("fullName2");
+        client2.setPhoneNumber("2222222");
         clientRepository.save(client2);
     }
 
@@ -36,17 +38,17 @@ public class FillingTests {
     private CategoryRepository categoryRepository;
 
     @Autowired
-    ProductRepository productRepository;
+    private ProductRepository productRepository;
 
-    @Test
-    public void createCategory(Category category, String name, Category parent) {
+    
+    void createCategory(Category category, String name, Category parent) {
         category.setName(name);
         category.setParent(parent);
         categoryRepository.save(category);
     }
-
-    @Test
-    public void createProduct(Product product, Category category, String name, String descriptions, Double price) {
+    
+    
+    void createProduct(Product product, Category category, String name, String descriptions, Double price) {
         product.setCategory(category);
         product.setName(name);
         product.setDescription(descriptions);
@@ -55,7 +57,7 @@ public class FillingTests {
     }
 
     @Test
-    public void creations() {      //Создание категорий и товаров
+    void creations() {      //Создание категорий и товаров
 
         Category  pizza = new Category();
         createCategory(pizza, "Пицца", null);
