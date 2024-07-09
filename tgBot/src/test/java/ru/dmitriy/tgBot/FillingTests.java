@@ -4,12 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import ru.dmitriy.tgBot.DataBase.repository.CategoryRepository;
-import ru.dmitriy.tgBot.DataBase.repository.ClientRepository;
-import ru.dmitriy.tgBot.DataBase.repository.ProductRepository;
-import ru.dmitriy.tgBot.DataBase.entity.Category;
-import ru.dmitriy.tgBot.DataBase.entity.Client;
-import ru.dmitriy.tgBot.DataBase.entity.Product;
+import ru.dmitriy.tgBot.DataBase.entity.*;
+import ru.dmitriy.tgBot.DataBase.repository.*;
 
 @SpringBootTest
 class FillingTests {
@@ -23,22 +19,11 @@ class FillingTests {
     @Autowired
     private ProductRepository productRepository;
 
-    @Test
-    void createTwoClients() {
-        Client client1 = new Client();
-        client1.setAddress("address1");
-        client1.setExternalId(1L);
-        client1.setFullName("fullName1");
-        client1.setPhoneNumber("1111111");
-        clientRepository.save(client1);
+    @Autowired
+    private ClientOrderRepository clientOrderRepository;
 
-        Client client2 = new Client();
-        client2.setAddress("address2");
-        client2.setExternalId(2L);
-        client2.setFullName("fullName2");
-        client2.setPhoneNumber("2222222");
-        clientRepository.save(client2);
-    }
+    @Autowired
+    private OrderProductRepository orderProductRepository;
 
     private Category createCategory(String name, Category parent) {
         Category category = new Category();
@@ -48,13 +33,41 @@ class FillingTests {
         return category;
     }
 
-    private void createProduct(Category category, String name, String description, Double price) {
+    private Product createProduct(Category category, String name, String description, Double price) {
         Product product = new Product();
         product.setCategory(category);
         product.setName(name);
         product.setDescription(description);
         product.setPrice(price);
-        productRepository.save(product);   
+        productRepository.save(product);
+        return product;
+    }
+
+    private Client createClient(Long externalId, String fullName, String phoneNumber, String address) {
+        Client client = new Client();
+        client.setExternalId(externalId);
+        client.setFullName(fullName);
+        client.setPhoneNumber(phoneNumber);
+        client.setAddress(address);
+        clientRepository.save(client);
+        return client;
+    }
+
+    private ClientOrder createOrder(Client client, Integer status, Double total) {
+        ClientOrder clientOrder = new ClientOrder();
+        clientOrder.setClient(client);
+        clientOrder.setStatus(status);
+        clientOrder.setTotal(total);
+        clientOrderRepository.save(clientOrder);
+        return clientOrder;
+    }
+
+    private void createOrderProduct(ClientOrder clientOrder, Product product, Integer countProduct) {
+        OrderProduct orderProduct = new OrderProduct();
+        orderProduct.setClientOrder(clientOrder);
+        orderProduct.setProduct(product);
+        orderProduct.setCountProduct(countProduct);
+        orderProductRepository.save(orderProduct);
     }
 
     @Test
@@ -79,17 +92,17 @@ class FillingTests {
         Category drinkOther = createCategory("Другие", drink);
 
         //Пицца
-        createProduct(pizza, "Пеперони", "Это пеперони", 500.50);
+        Product product1 = createProduct(pizza, "Пеперони", "Это пеперони", 500.50);
         createProduct(pizza, "Маргарита", "Это Маргарита", 400.00);
         createProduct(pizza, "Гавайская", "Это Гавайская", 450.75);
 
         // Классические роллы
-        createProduct(rollClassic, "Филадельфия", "Классический ролл с лососем и сливочным сыром", 300.00);
+        Product product2 = createProduct(rollClassic, "Филадельфия", "Классический ролл с лососем и сливочным сыром", 300.00);
         createProduct(rollClassic, "Калифорния", "Ролл с крабом и авокадо", 280.00);
         createProduct(rollClassic, "Спайси тунец", "Ролл с острым тунцом", 320.00);
 
         // Запечённые роллы
-        createProduct(rollBaked, "Запечённая Филадельфия", "Запечённый ролл с лососем и сливочным сыром", 350.00);
+        Product product3 = createProduct(rollBaked, "Запечённая Филадельфия", "Запечённый ролл с лососем и сливочным сыром", 350.00);
         createProduct(rollBaked, "Запечённый краб", "Запечённый ролл с крабовым мясом", 370.00);
         createProduct(rollBaked, "Запечённый угорь", "Запечённый ролл с угрём", 390.00);
 
@@ -132,5 +145,37 @@ class FillingTests {
         createProduct(drinkOther, "Чай", "Чёрный чай", 30.00);
         createProduct(drinkOther, "Кофе", "Свежезаваренный кофе", 35.00);
         createProduct(drinkOther, "Молочный коктейль", "Коктейль с ванильным вкусом", 40.00);
+
+        //Создание клиентов
+        Client client1 = createClient(111L, "Adam", "111", "a");
+        Client client2 = createClient(222L, "Bob", "222", "b");
+        Client client3 = createClient(333L, "Cris", "222", "c");
+
+        //Создание заказов
+        ClientOrder order1 = createOrder(client1, 1, 100.0);
+        ClientOrder order2 = createOrder(client1, 1, 500.0);
+        ClientOrder order3 = createOrder(client1, 1, 600.0);
+
+        ClientOrder order4 = createOrder(client2, 1, 1000.0);
+        ClientOrder order5 = createOrder(client2, 1, 1200.0);
+
+        ClientOrder order6 = createOrder(client3, 1, 10000.0);
+
+        //Создание продуктов в заказах
+        createOrderProduct(order1, product1, 2);
+        createOrderProduct(order1, product2, 1);
+        createOrderProduct(order1, product3, 5);
+        createOrderProduct(order2, product1, 1);
+        createOrderProduct(order2, product2, 2);
+        createOrderProduct(order3, product3, 2);
+
+        createOrderProduct(order4, product1, 2);
+        createOrderProduct(order4, product2, 1);
+        createOrderProduct(order4, product3, 5);
+        createOrderProduct(order5, product1, 1);
+        createOrderProduct(order5, product2, 2);
+
+        createOrderProduct(order6, product1, 1);
+        createOrderProduct(order6, product2, 2);
     }
 }
