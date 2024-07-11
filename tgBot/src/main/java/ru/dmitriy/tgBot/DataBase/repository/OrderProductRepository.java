@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
+import ru.dmitriy.tgBot.DataBase.entity.Client;
 import ru.dmitriy.tgBot.DataBase.entity.ClientOrder;
 import ru.dmitriy.tgBot.DataBase.entity.OrderProduct;
 import ru.dmitriy.tgBot.DataBase.entity.Product;
@@ -19,5 +20,6 @@ public interface OrderProductRepository extends JpaRepository<OrderProduct, Long
             "WHERE co.client.id = :clientId")
     List<Product> getClientProducts(@Param("clientId") Long clientId);
 
-    List<OrderProduct> findByClientOrderIn(List<ClientOrder> clientOrders);
+    List<OrderProduct> findByClientOrderId(Long id);
+    boolean existsByProduct(Product product);
 }
