@@ -1,8 +1,7 @@
 package ru.dmitriy.tgBot.DataBase.service;
 
-import ru.dmitriy.tgBot.DataBase.entity.Client;
-import ru.dmitriy.tgBot.DataBase.entity.ClientOrder;
-import ru.dmitriy.tgBot.DataBase.entity.Product;
+import org.hibernate.query.Order;
+import ru.dmitriy.tgBot.DataBase.entity.*;
 
 import java.util.List;
 /**
@@ -10,6 +9,47 @@ import java.util.List;
  */
 public interface EntitiesService
 {
+    /**
+     * Найти товар по Id
+     * @param id Id товара
+     */
+    Product getProductById(Long id);
+    /**
+     * Существует ли товар в заказе
+     * @param product Требуемый товар
+     */
+    boolean existsByProduct(Product product);
+    /**
+     * Добавить товар к заказу
+     * @param clientOrder КлиентЮ сделавший заказ
+     * @param product
+     */
+    OrderProduct postProduct(ClientOrder clientOrder, Product product, Integer count);
+    /**
+     * Существует ли клиент с указанным externalId
+     * @param id
+     */
+    Client findByExternalId(Long id);
+    /**
+     * Создать заказ
+     * @param client Клиент, сделавший заказ
+     * @param status Статус заказа
+     * @param total Цена заказа
+     */
+    ClientOrder postOrder(Client client, Integer status, Double total);
+    /**
+     * Создать клиента
+     * @param id идентификатор клиента
+     * @param fullName Имя и фамилия клиента
+     * @param phoneNumber Номер телефона клиента
+     * @param address Адресс клиента
+     */
+    Client postClient(Long id, String fullName, String phoneNumber, String address);
+    /**
+     * Получить список категорий по ID родителя
+     * @param id идентификатор родителя
+     */  
+    List<Category> getCategoriesByParentId(Long id);
     /**
      * Получить список товаров в категории
      * @param id идентификатор категории
